@@ -91,9 +91,10 @@ class SalesOrderController extends Controller
     //     return response()->json(['message' => 'Deleted sales order successfully'], 200);
     // }
 
-    public function destroy(SalesOrder $order)
+    public function destroy(string $id)
     {
-        $order->delete();
-        return response()->json(['message' => 'Deleted sales order successfully zzz'], 200);
+        $salesOrder = SalesOrder::findOrFail($id);
+        $salesOrder->delete();
+        return response()->json(['message' => 'Deleted sales order successfully yyyy'], 200);
     }
 }
