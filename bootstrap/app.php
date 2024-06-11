@@ -12,10 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->alias([
-            'skipAuthOnGetReq' => \App\Http\Middleware\SkipAuthOnGetRequest::class,
-            'csrfExempt' => \App\Http\Middleware\CsrfExemptMiddleware::class,
-        ]);
+        // $middleware->alias([
+        //     'skipAuthOnGetReq' => \App\Http\Middleware\SkipAuthOnGetRequest::class,
+        //     'csrfExempt' => \App\Http\Middleware\CsrfExemptMiddleware::class,
+        // ]);
+        $middleware->validateCsrfTokens(except:['/*']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
