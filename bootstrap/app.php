@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'skipAuthOnGetReq' => \App\Http\Middleware\SkipAuthOnGetRequest::class,
+            'csrfExempt' => \App\Http\Middleware\CsrfExemptMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
