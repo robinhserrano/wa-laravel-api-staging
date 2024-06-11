@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $salesOrderFactory = SalesOrderFactory::new();
-        $salesOrders = $salesOrderFactory->count(20)->create();
+        $salesOrders = $salesOrderFactory->count(2000)->create();
 
         // Seed order lines for each sales order
         foreach ($salesOrders as $salesOrder) {

@@ -101,8 +101,5 @@ class SalesOrderController extends Controller
         } catch (Exception $e) {
             return response()->json(['error' => 'Sales order not found'], 404);
         }
-        // $salesOrder = SalesOrder::findOrFail($id);
-        // $salesOrder->delete();
-        // return response()->json(['message' => 'Deleted sales order successfully yyyy'], 200);
     }
 }
