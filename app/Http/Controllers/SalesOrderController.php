@@ -93,7 +93,7 @@ class SalesOrderController extends Controller
 
     public function destroy(SalesOrder $order)
     {
-        // $order->delete();
+        $order->delete();
         return response()->json(['message' => 'Deleted sales order successfully'], 200);
     }
 }
