@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderLine;
 use App\Models\SalesOrder;
+use Exception;
 use Illuminate\Http\Request;
 
 class SalesOrderController extends Controller
@@ -93,8 +94,15 @@ class SalesOrderController extends Controller
 
     public function destroy(string $id)
     {
-        $salesOrder = SalesOrder::findOrFail($id);
-        $salesOrder->delete();
-        return response()->json(['message' => 'Deleted sales order successfully yyyy'], 200);
+        try {
+            $salesOrder = SalesOrder::findOrFail($id);
+            $salesOrder->delete();
+            return response()->json(['message' => 'Deleted sales order successfully'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Sales order not found'], 404);
+        }
+        // $salesOrder = SalesOrder::findOrFail($id);
+        // $salesOrder->delete();
+        // return response()->json(['message' => 'Deleted sales order successfully yyyy'], 200);
     }
 }
