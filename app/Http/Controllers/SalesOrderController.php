@@ -33,6 +33,7 @@ class SalesOrderController extends Controller
     public function store(Request $request)
     {
         $orderData = $request->all(); // Get all request data as an array
+        return $orderData;
 
         // Check if a SalesOrder with the same name already exists
         $existingOrder = SalesOrder::where('name', $orderData['name'])->first();
