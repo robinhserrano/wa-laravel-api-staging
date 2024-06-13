@@ -53,13 +53,13 @@ class SalesOrderController extends Controller
             $salesOrder->fill(Arr::only($orderData, $allowedColumns));
             $salesOrder->save();
 
-            foreach ($request['order_line'] as $orderLineData) {
-                // Set the sales_order_id based on the parent SalesOrder
-                $orderLineData['sales_order_id'] = $salesOrder->id;
+            // foreach ($request['order_line'] as $orderLineData) {
+            //     // Set the sales_order_id based on the parent SalesOrder
+            //     $orderLineData['sales_order_id'] = $salesOrder->id;
 
-                // Create and save a new OrderLine instance
-                OrderLine::create(Arr::only($orderLineData, $allowedColumns2));
-            }
+            //     // Create and save a new OrderLine instance
+            //     OrderLine::create(Arr::only($orderLineData, $allowedColumns2));
+            // }
         }
 
         // foreach ($request['order_line'] as $orderLineData) {
