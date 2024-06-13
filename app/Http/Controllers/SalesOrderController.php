@@ -61,32 +61,106 @@ class SalesOrderController extends Controller
             }
         }
 
+        // if (!empty($request['order_line'])) {
+        //     // Collect requested orderLine ids
+        //     $requestedOrderLineIds = [];
+        //     foreach ($request['order_line'] as $orderLineData) {
+        //         if (isset($orderLineData['id'])) { // Check if 'id' key exists
+        //             $requestedOrderLineIds[] = $orderLineData['id'];
+        //         }
+        //     }
+
+        //     // Delete entries not in the request
+        //     OrderLine::where('sales_order_id', $salesOrder->id)
+        //         ->whereNotIn('id', $requestedOrderLineIds)
+        //         ->delete();
+
+        //     // Update or create remaining entries (existing logic)
+        //     foreach ($request['order_line'] as $orderLineData) {
+        //         $existingOrderLine = OrderLine::where('id', $orderLineData['id'])->first(); //fix this repetitive
+        //         if ($existingOrderLine) {
+        //             $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
+        //         } else {
+        //             $orderLineData['sales_order_id'] = $salesOrder->id;
+        //             OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
+        //         }
+        //     }
+        // }
+
+        //BETA
+        // if (!empty($request['order_line'])) {
+        //     $existingOrderLineIds = [];
+        //     foreach ($request['order_line'] as $orderLineData) {
+        //         if (isset($orderLineData['id'])) {
+        //             $existingOrderLineIds[] = $orderLineData['id'];
+        //         }
+        //     }
+
+        //     // Fix: Use empty array for deletion (no logic for deletion in current code)
+        //     $deleteOrderLineIds = array_diff($existingOrderLineIds, array_column($existingOrderLineIds, '.'));
+
+
+        //     // Delete entries not in the request (if necessary)
+        //     if (!empty($deleteOrderLineIds)) {  // Commented out as deleteOrderLineIds is always empty
+        //         OrderLine::whereIn('id', $deleteOrderLineIds)->delete();
+        //     }
+
+        //     // Update existing entries
+        //     $existingOrderLines = OrderLine::whereIn('id', $existingOrderLineIds)
+        //         ->where('sales_order_id', $salesOrder->id)
+        //         ->get();
+
+        //     foreach ($existingOrderLines as $existingOrderLine) {
+        //         $existingOrderLine->update(Arr::only($request['order_line'], $allowedOrderLine));
+        //     }
+
+        //     // Create new entries (without 'id')
+        //     foreach ($request['order_line'] as $orderLineData) {
+        //         if (!isset($orderLineData['id'])) {
+        //             $orderLineData['sales_order_id'] = $salesOrder->id;
+        //             OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
+        //         }
+        //     }
+        // }
+
         if (!empty($request['order_line'])) {
-            // Collect requested orderLine ids
-            $requestedOrderLineIds = [];
+            $existingOrderLineIds = [];
             foreach ($request['order_line'] as $orderLineData) {
-                if (isset($orderLineData['id'])) { // Check if 'id' key exists
-                    $requestedOrderLineIds[] = $orderLineData['id'];
+                if (isset($orderLineData['id'])) {
+                    $existingOrderLineIds[] = $orderLineData['id'];
                 }
             }
-
+        
             // Delete entries not in the request
-            OrderLine::where('sales_order_id', $salesOrder->id)
-                ->whereNotIn('id', $requestedOrderLineIds)
-                ->delete();
-
-            // Update or create remaining entries (existing logic)
+            $existingOrderLineIdsFromDB = OrderLine::where('sales_order_id', $salesOrder->id)
+                ->pluck('id')
+                ->toArray();
+        
+            $deleteOrderLineIds = array_diff($existingOrderLineIdsFromDB, $existingOrderLineIds);
+        
+            if (!empty($deleteOrderLineIds)) {
+                OrderLine::whereIn('id', $deleteOrderLineIds)->delete();
+            }
+        
+            // Update existing entries
             foreach ($request['order_line'] as $orderLineData) {
-                $existingOrderLine = OrderLine::where('id', $orderLineData['id'])->first();
-                if ($existingOrderLine) {
-                    $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
-                } else {
+                if (isset($orderLineData['id'])) {
+                    $existingOrderLine = OrderLine::find($orderLineData['id']);
+                    if ($existingOrderLine) {
+                        $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
+                    }
+                }
+            }
+        
+            // Create new entries (without 'id')
+            foreach ($request['order_line'] as $orderLineData) {
+                if (!isset($orderLineData['id'])) {
                     $orderLineData['sales_order_id'] = $salesOrder->id;
                     OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
                 }
             }
         }
-
+        
 
         return response()->json(['message' => 'Sales order created successfully'], 201); // Created
     }
