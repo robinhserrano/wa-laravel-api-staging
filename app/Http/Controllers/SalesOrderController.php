@@ -33,24 +33,22 @@ class SalesOrderController extends Controller
     public function store(Request $request)
     {
         // $orderData = $request->all(); // Get all request data as an array
-        // return $orderData;
+
+        $allowedSalesOrder = ['amount_to_invoice', 'amount_total', 'amount_untaxed', 'create_date', 'delivery_status', 'internal_note_display', 'name', 'partner_id_contact_address', 'partner_id_display_name', 'partner_id_phone', 'state', 'x_studio_commission_paid', 'x_studio_invoice_payment_status', 'x_studio_payment_type', 'x_studio_referrer_processed', 'x_studio_sales_rep_1', 'x_studio_sales_source'];
+        $allowedOrderLine = ['sales_order_id', 'product', 'description', 'quantity', 'unit_price', 'tax_excl', 'disc', 'taxes', 'delivered', 'invoiced'];
+
         $orderData = ['amount_to_invoice' => $request['amount_to_invoice'], 'amount_total'  => $request['amount_total'], 'amount_untaxed' => $request['amount_untaxed'], 'create_date' => $request['create_date'], 'delivery_status' => $request['delivery_status'], 'internal_note_display' => $request['internal_note_display'], 'name' => $request['name'], 'partner_id_contact_address' => $request['partner_id_contact_address'], 'partner_id_display_name' => $request['partner_id_display_name'], 'partner_id_phone' => $request['partner_id_phone'], 'state' => $request['state'], 'x_studio_commission_paid' => $request['x_studio_commission_paid'], 'x_studio_invoice_payment_status' => $request['x_studio_invoice_payment_status'], 'x_studio_payment_type' => $request['x_studio_payment_type'], 'x_studio_referrer_processed' => $request['x_studio_referrer_processed'], 'x_studio_sales_rep_1' => $request['x_studio_sales_rep_1'], 'x_studio_sales_source' => $request['x_studio_sales_source']];
-
-
-        // Check if a SalesOrder with the same name already exists
         $existingOrder = SalesOrder::where('name', $orderData['name'])->first();
-        $allowedColumns = ['amount_to_invoice', 'amount_total', 'amount_untaxed', 'create_date', 'delivery_status', 'internal_note_display', 'name', 'partner_id_contact_address', 'partner_id_display_name', 'partner_id_phone', 'state', 'x_studio_commission_paid', 'x_studio_invoice_payment_status', 'x_studio_payment_type', 'x_studio_referrer_processed', 'x_studio_sales_rep_1', 'x_studio_sales_source'];
-        $allowedColumns2 = ['sales_order_id', 'product', 'description', 'quantity', 'unit_price', 'tax_excl', 'disc', 'taxes', 'delivered', 'invoiced'];
 
         if ($existingOrder) {
             // Name already exists, handle update scenario
-            $existingOrder->update(Arr::only($orderData, $allowedColumns));
+            $existingOrder->update(Arr::only($orderData, $allowedSalesOrder));
             return response()->json(['message' => 'Sales order updated successfully'], 200); // OK
         } else {
             // New Sales Order, create a new instance
 
             $salesOrder = new SalesOrder();
-            $salesOrder->fill(Arr::only($orderData, $allowedColumns));
+            $salesOrder->fill(Arr::only($orderData, $allowedSalesOrder));
             $salesOrder->save();
             if (!empty($request['order_line'])) {
                 foreach ($request['order_line'] as $orderLineData) {
@@ -58,7 +56,33 @@ class SalesOrderController extends Controller
                     $orderLineData['sales_order_id'] = $salesOrder->id;
 
                     // Create and save a new OrderLine instance
-                    OrderLine::create(Arr::only($orderLineData, $allowedColumns2));
+                    OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
+                }
+            }
+        }
+
+        if (!empty($request['order_line'])) {
+            // Collect requested orderLine ids
+            $requestedOrderLineIds = [];
+            foreach ($request['order_line'] as $orderLineData) {
+                if (isset($orderLineData['id'])) { // Check if 'id' key exists
+                    $requestedOrderLineIds[] = $orderLineData['id'];
+                }
+            }
+
+            // Delete entries not in the request
+            OrderLine::where('sales_order_id', $salesOrder->id)
+                ->whereNotIn('id', $requestedOrderLineIds)
+                ->delete();
+
+            // Update or create remaining entries (existing logic)
+            foreach ($request['order_line'] as $orderLineData) {
+                $existingOrderLine = OrderLine::where('id', $orderLineData['id'])->first();
+                if ($existingOrderLine) {
+                    $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
+                } else {
+                    $orderLineData['sales_order_id'] = $salesOrder->id;
+                    OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
                 }
             }
         }
