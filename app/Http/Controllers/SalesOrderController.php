@@ -73,8 +73,6 @@ class SalesOrderController extends Controller
                         $existingOrderLine = OrderLine::find($orderLineData['id']);
                         if ($existingOrderLine) {
                             $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
-                        } else {
-                            OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
                         }
                     } else {
                         // Create new OrderLine
@@ -89,15 +87,15 @@ class SalesOrderController extends Controller
         }
 
         // Delete entries not in the request (unchanged logic)
-        $existingOrderLineIdsFromDB = OrderLine::where('sales_order_id', $salesOrder->id)
-            ->pluck('id')
-            ->toArray();
+        // $existingOrderLineIdsFromDB = OrderLine::where('sales_order_id', $salesOrder->id)
+        //     ->pluck('id')
+        //     ->toArray();
 
-        $deleteOrderLineIds = array_diff($existingOrderLineIdsFromDB, array_column($request['order_line'], 'id'));
+        // $deleteOrderLineIds = array_diff($existingOrderLineIdsFromDB, array_column($request['order_line'], 'id'));
 
-        if (!empty($deleteOrderLineIds)) {
-            OrderLine::whereIn('id', $deleteOrderLineIds)->delete();
-        }
+        // if (!empty($deleteOrderLineIds)) {
+        //     OrderLine::whereIn('id', $deleteOrderLineIds)->delete();
+        // }
 
 
         return response()->json(['message' => 'Sales order created successfully'], 201); // Created
