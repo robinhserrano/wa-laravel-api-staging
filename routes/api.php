@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Http\Controllers\SalesOrderController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,3 +28,7 @@ Route::post('/sanctum/token', function (Request $request) {
  
     return $user->createToken($request->password)->plainTextToken;
 });
+
+Route::middleware('auth:sanctum')->resource('salesOrder', SalesOrderController::class, [
+    'except' => ['create', 'edit']
+]);

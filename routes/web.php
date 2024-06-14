@@ -8,8 +8,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware('auth:sanctum')->resource('salesOrder', SalesOrderController::class, [
-    'except' => ['create', 'edit']
-]);
+// Route::middleware('auth:sanctum')->resource('salesOrder', SalesOrderController::class, [
+//     'except' => ['create', 'edit']
+// ]);
 
 // csrfExempt', 'auth:sanctum
