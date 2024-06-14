@@ -41,7 +41,34 @@ class SalesOrderController extends Controller
         //SalesOrder
         if ($existingOrder) {
             // Name already exists, handle update scenario
-            $existingOrder->update(Arr::only($orderData, $allowedSalesOrder));
+            // $existingOrder->update(Arr::only($orderData, $allowedSalesOrder));
+
+            if (!empty($request['order_line'])) {
+
+                foreach ($request['order_line'] as $orderLineData) {
+                    // Set the sales_order_id based on the parent SalesOrder
+                    // $existingOrderLine =  //OrderLine::find($orderLineData['id']);
+                    //     $orderLineData['sales_order_id'] = $existingOrder->id;
+
+                    // $existingOrderLine = OrderLine::where('sales_order_id', $orderLineData->id);
+
+                    $existingOrderLine = OrderLine::where('sales_order_id', $existingOrder->id)
+                        ->where('product', $orderLineData['product'])
+                        ->first();
+
+                    if ($existingOrder) {
+                        $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
+                    } else {
+                        OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
+                    }
+
+                    // Create and save a new OrderLine instance
+
+
+                }
+            }
+
+
             return response()->json(['message' => 'Sales order updated successfully'], 200); // OK
         } else {
             // New Sales Order, create a new instance
