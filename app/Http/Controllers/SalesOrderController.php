@@ -61,10 +61,6 @@ class SalesOrderController extends Controller
                     } else {
                         OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
                     }
-
-                    // Create and save a new OrderLine instance
-
-
                 }
             }
 

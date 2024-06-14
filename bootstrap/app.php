@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\Cors;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'skipAuthOnGetReq' => \App\Http\Middleware\SkipAuthOnGetRequest::class,
             'csrfExempt' => \App\Http\Middleware\CsrfExemptMiddleware::class,
+       
         ]);
         $middleware->validateCsrfTokens(except:['/*']);
     })
