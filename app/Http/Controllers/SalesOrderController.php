@@ -64,23 +64,25 @@ class SalesOrderController extends Controller
         if (!empty($request['order_line'])) {
             foreach ($request['order_line'] as $orderLineData) {
                 // Set sales_order_id even if data is empty (optional)
-                $orderLineData['sales_order_id'] = $salesOrder->id;
 
-                OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
+
+                // OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
 
                 // Check if data exists before creating or updating
-                // if (!empty($orderLineData)) {
-                //     if (isset($orderLineData['id'])) {
-                //         // Update existing OrderLine
-                //         $existingOrderLine = OrderLine::find($orderLineData['id']);
-                //         if ($existingOrderLine) {
-                //             $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
-                //         }
-                //     } else {
-                //         // Create new OrderLine
-                //         OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
-                //     }
-                // }
+                if (!empty($orderLineData)) {
+                    if (isset($orderLineData['id'])) {
+                        // Update existing OrderLine
+                        $orderLineData['sales_order_id'] = $existingOrder->id;
+                        $existingOrderLine = OrderLine::find($orderLineData['id']);
+                        if ($existingOrderLine) {
+                            $existingOrderLine->update(Arr::only($orderLineData, $allowedOrderLine));
+                        }
+                    } else {
+                        $orderLineData['sales_order_id'] = $salesOrder->id;
+                        // Create new OrderLine
+                        OrderLine::create(Arr::only($orderLineData, $allowedOrderLine));
+                    }
+                }
             }
         } else {
             // Handle empty request['order_line'] scenario (optional)
