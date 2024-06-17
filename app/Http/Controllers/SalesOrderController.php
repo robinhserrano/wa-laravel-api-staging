@@ -259,7 +259,6 @@ class SalesOrderController extends Controller
 
 
         foreach ($request as $orderData) {
-            return $orderData;
             $filteredSalesOrder = Arr::only($orderData, $allowedSalesOrder);
             $salesOrders[] = $filteredSalesOrder;
 
@@ -271,6 +270,8 @@ class SalesOrderController extends Controller
                 }
             }
         }
+
+        return 'haha';
 
         // Insert Sales Orders in bulk
         SalesOrder::insert($salesOrders);
