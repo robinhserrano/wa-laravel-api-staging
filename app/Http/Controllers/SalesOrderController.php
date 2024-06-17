@@ -279,22 +279,22 @@ class SalesOrderController extends Controller
         // return 'haha';
 
         // Insert Sales Orders in bulk
-        SalesOrder::insert($salesOrders);
+        // SalesOrder::insert($salesOrders);
 
-        // Get the inserted Sales Order IDs
-        $insertedOrderIds = SalesOrder::select('id')->whereIn('name', array_column($salesOrders, 'name'))->pluck('id');
+        // // Get the inserted Sales Order IDs
+        // $insertedOrderIds = SalesOrder::select('id')->whereIn('name', array_column($salesOrders, 'name'))->pluck('id');
 
-        // Assign Sales Order IDs to Order Lines
-        foreach ($orderLines as &$orderLine) {
-            $orderLine['sales_order_id'] = $insertedOrderIds->search(function ($id) use ($orderLine) {
-                return $orderLine['name'] === SalesOrder::find($id)->name;
-            });
-        }
+        // // Assign Sales Order IDs to Order Lines
+        // foreach ($orderLines as &$orderLine) {
+        //     $orderLine['sales_order_id'] = $insertedOrderIds->search(function ($id) use ($orderLine) {
+        //         return $orderLine['name'] === SalesOrder::find($id)->name;
+        //     });
+        // }
 
-        // Insert Order Lines in bulk (if any)
-        if (!empty($orderLines)) {
-            OrderLine::insert($orderLines);
-        }
+        // // Insert Order Lines in bulk (if any)
+        // if (!empty($orderLines)) {
+        //     OrderLine::insert($orderLines);
+        // }
 
         return response()->json(['message' => 'Sales orders created successfully'], 201); // Created
     }
