@@ -259,7 +259,7 @@ class SalesOrderController extends Controller
 
         $salesOrderList = $request->all();
 
-        return $salesOrderList;
+        // return $salesOrderList;
 
         foreach ($salesOrderList as $orderData) {
             $filteredSalesOrder = Arr::only($orderData, $allowedSalesOrder);
