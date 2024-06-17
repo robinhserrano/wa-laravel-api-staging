@@ -23,7 +23,7 @@ class SalesOrderFactory extends Factory
             'amount_untaxed' => fake()->randomFloat(2, 0, 10000),
             'create_date' => now(),
             'delivery_status' => fake()->randomElement(['pending', 'partial', 'full']),
-            'internal_note_display' =>  substr(fake()->paragraph, 0, 250) ,
+            'internal_note_display' =>  substr(fake()->paragraph, 0, 250),
             'name' => fake()->unique()->uuid, // Ensure unique identifier
             'partner_id_contact_address' => fake()->address,
             'partner_id_display_name' => fake()->name,
