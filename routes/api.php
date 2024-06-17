@@ -32,3 +32,5 @@ Route::post('/sanctum/token', function (Request $request) {
 Route::middleware('auth:sanctum')->resource('salesOrder', SalesOrderController::class, [
     'except' => ['create', 'edit']
 ]);
+
+Route::post('/bulkStore', [SalesOrderController::class, 'bulkStore']);
