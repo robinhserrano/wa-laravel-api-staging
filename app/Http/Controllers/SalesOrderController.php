@@ -274,7 +274,7 @@ class SalesOrderController extends Controller
             }
         }
 
-        return 'haha';
+        // return 'haha';
 
         // Insert Sales Orders in bulk
         SalesOrder::insert($salesOrders);
