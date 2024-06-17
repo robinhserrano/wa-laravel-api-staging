@@ -259,7 +259,7 @@ class SalesOrderController extends Controller
 
 
         foreach ($request as $orderData) {
-            return $request;
+            return $orderData;
             $filteredSalesOrder = Arr::only($orderData, $allowedSalesOrder);
             $salesOrders[] = $filteredSalesOrder;
 
