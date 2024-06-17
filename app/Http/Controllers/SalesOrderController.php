@@ -263,6 +263,7 @@ class SalesOrderController extends Controller
 
         // return $salesOrderList;
 
+
         foreach ($salesOrderList as $orderData) {
             $filteredSalesOrder = Arr::only($orderData, $allowedSalesOrder);
             $salesOrders[] = $filteredSalesOrder;
@@ -270,7 +271,7 @@ class SalesOrderController extends Controller
             if (!empty($orderData['order_line'])) {
                 foreach ($orderData['order_line'] as $orderLineData) {
                     $filteredOrderLine = Arr::only($orderLineData, $allowedOrderLine);
-                    $filteredOrderLine['sales_order_id'] = null; // Placeholder for bulk assignment
+                    $filteredOrderLine['sales_order_id'] = $orderData['name']; // Placeholder for bulk assignment //Temporary placed orderData['name'] for later
                     $orderLines[] = $filteredOrderLine;
                 }
             }
@@ -279,22 +280,27 @@ class SalesOrderController extends Controller
         // return 'haha';
 
         // Insert Sales Orders in bulk
-        // SalesOrder::insert($salesOrders);
+        SalesOrder::insert($salesOrders);
 
-        // // Get the inserted Sales Order IDs
-        // $insertedOrderIds = SalesOrder::select('id')->whereIn('name', array_column($salesOrders, 'name'))->pluck('id');
+        // Get the inserted Sales Order IDs
+        $insertedOrderIds = SalesOrder::whereIn('name', array_column($salesOrders, 'name'))->pluck('id', 'name');
 
-        // // Assign Sales Order IDs to Order Lines
-        // foreach ($orderLines as &$orderLine) {
-        //     $orderLine['sales_order_id'] = $insertedOrderIds->search(function ($id) use ($orderLine) {
-        //         return $orderLine['name'] === SalesOrder::find($id)->name;
-        //     });
-        // }
+        // Assign Sales Order IDs to Order Lines
+        foreach ($orderLines as &$orderLine) {
+            $salesOrderName = $orderLine['sales_order_id'];
+            if (isset($insertedOrderIds[$salesOrderName])) {
+                $orderLine['sales_order_id'] = $insertedOrderIds[$salesOrderName];
+            } else {
+                // Handle case where sales order ID couldn't be found (if needed)
+                $orderLine['sales_order_id'] = null; // or handle error/rollback scenario
+            }
+        }
 
-        // // Insert Order Lines in bulk (if any)
-        // if (!empty($orderLines)) {
-        //     OrderLine::insert($orderLines);
-        // }
+
+        // Insert Order Lines in bulk (if any)
+        if (!empty($orderLines)) {
+            OrderLine::insert($orderLines);
+        }
 
         return response()->json(['message' => 'Sales orders created successfully'], 201); // Created
     }
